@@ -1,0 +1,146 @@
+---
+title: "assigment_week_2_part_1"
+format:
+  html:
+    self-contained: true
+editor: visual
+---
+
+---
+ Referencing your selected analysis, create each data model (vector, matrix, list and dataframe including one with factors).
+Comment each data model by describing what the data represents and data types
+As part of the dataframe data model, create a factor prior to its definition or afterward with the as.factor command.
+---
+
+Load data
+
+```{r}
+#Load data
+df_b <- read.csv("PM5011 Basic.csv")
+df_1 <- read.csv("PM5011 P1.csv")
+```
+
+Load columns of P1
+
+```{r}
+#Load columns of P1
+str(df_1)
+names(df_1)
+```
+
+Load columns of Basic
+
+```{r}
+#Load columns of Basic
+str(df_b)
+names(df_b)
+```
+
+Normalize columns
+
+```{r}
+#Normalize columns
+names(df_b)[names(df_b) == "X1..City"] <- "city"
+names(df_b)[names(df_b) == "X6..Socioeconomic.Class"] <- "socioeconomic_class"
+names(df_b)[names(df_b) == "X5..Education"]  <- "education"
+names(df_b)[names(df_b) == "Weight"]  <- "weight"
+names(df_b)[names(df_b) == "X4.1.Age.Range"] <- "age_range"
+names(df_b)[names(df_b) == "X3..Gender..declared."]  <- "gender"
+names(df_b)[names(df_b) == "nquest"]  <- "id"
+
+names(df_1)[names(df_1) == "P1...Participation..grouped."]  <- "cultural_participation"
+names(df_1)[names(df_1) == "P1...Cultural.Activity"]  <- "kind_of_activity"
+names(df_1)[names(df_1) == "nquest"]  <- "id"
+names(df_1)[names(df_1) == "P1.Count"]  <- "count_of_activity"
+
+names(df_b)
+names(df_1)
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+```{r}
+#checking values
+unique(df$socioeconomic_class)
+
+```
+
+Creating Vector for city
+
+```{r}
+#Creating Vector for city
+city_vec <- as.character(df_b$city)
+typeof(city_vec)
+```
+
+Creating Matrix with id number and the count of activity each person had
+
+```{r}
+#Creating Matrix with id number and the count of activity each person had
+id_num    <- as.numeric(df_1$id)
+act_count_num <- as.numeric(df_1$count_of_activity)
+
+activity_matrix <- cbind(id = id_num, count_of_activity = act_count_num)
+
+is.matrix(activity_matrix)
+mode(activity_matrix) 
+head(activity_matrix)
+
+summary(activity_matrix)
+```
+
+Create a List for the person on the first row
+
+```{r}
+#Create a List for the person on the first row
+row_1_list <- list(
+  id         = df_b$id[1],
+  age_range  = df_b$age_range[1],
+  education  = df_b$education[1],
+  gender     = df_b$gender[1],
+  name       = "Bob",
+  flag       = TRUE       
+)
+
+row_1_list
+str(row_1_list)
+```
+
+Create a Data frame with only the columns I need and merge both tables
+
+```{r}
+#Create a Data frame with only the columns I need and merge both tables
+
+b_keep <- df_b[, c("id", "city", "socioeconomic_class", "education",
+                   "age_range", "gender", "weight")]
+
+p1_keep <- df_1[, c("id", "cultural_participation", "kind_of_activity",
+                    "count_of_activity")]
+
+df <- merge(b_keep, p1_keep, by = "id", all = FALSE)
+
+df$city <- as.factor(df$city)
+df$socioeconomic_class <- as.factor(df$socioeconomic_class)
+
+str(df$socioeconomic_class)
+levels(df$socioeconomic_class)
+```
+
+Save the new data frame
+
+```{r}
+#Save the new data frame
+write.csv(df, "merged_dataset.csv", row.names = FALSE)
+getwd()
+```
+
+Convet file
+
+```{r}
+#Convet file
+knitr::purl("assigment_week_2_part_1.qmd", output = "assigment_week_2_part_1.R")
+
+getwd()
+```
